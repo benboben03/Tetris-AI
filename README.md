@@ -1,3 +1,3 @@
 # CS 175 Tetris AI
 
-Tetris Gym environment imported from https://pypi.org/project/gym-tetris/3.0.4/ in which all files was placed in gym_tetris directory.
+Tetris Gym environment imported from https://max-we.github.io/Tetris-Gymnasium/ in which all files was placed in tetris_gymnasium directory.

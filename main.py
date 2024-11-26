@@ -1,15 +1,18 @@
-from nes_py.wrappers import JoypadSpace
-import gym_tetris
-from gym_tetris.actions import MOVEMENT
+import cv2
+import gymnasium as gym
 
-env = gym_tetris.make('TetrisA-v0')
-env = JoypadSpace(env, MOVEMENT)
+from tetris_gymnasium.envs.tetris import Tetris
 
-done = True
-for step in range(5000):
-    if done:
-        state = env.reset()
-    state, reward, done, info = env.step(env.action_space.sample())
-    env.render()
+if __name__ == "__main__":
+    env = gym.make("tetris_gymnasium/Tetris", render_mode="human")
+    env.reset(seed=42)
 
-env.close()
+    terminated = False
+    while not terminated:
+        env.render()
+        action = env.action_space.sample()
+        observation, reward, terminated, truncated, info = env.step(action)
+        key = cv2.waitKey(100) # timeout to see the movement
+    print("Game Over!")
+
+
