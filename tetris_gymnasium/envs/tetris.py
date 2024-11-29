@@ -109,6 +109,8 @@ class Tetris(gym.Env):
         self.game_over = False
         self.height: int = height
         self.width: int = width
+        self.previous_holes = 0
+        self.previous_max_height = 0
 
         # Base Pixels
         if base_pixels is None:
@@ -207,53 +209,67 @@ class Tetris(gym.Env):
             action: The action to be executed.
 
         Returns:
-            observation: The observation of the current board as np array.
+            observation: The observation of the current board as a numpy array.
             reward: Amount of reward returned after previous action.
-            done: Whether the episode has ended, in which case further step() calls will return undefined results.
-            info: Contains auxiliary diagnostic information (helpful for debugging, and sometimes learning).
+            done: Whether the episode has ended.
+            truncated: Whether the episode was truncated (not applicable here).
+            info: Contains auxiliary diagnostic information.
         """
         assert self.action_space.contains(
             action
         ), f"{action!r} ({type(action)}) invalid"
 
         truncated = False  # Tetris without levels will never truncate
-        reward = 0
         lines_cleared = 0
+        reward = self.rewards.step_penalty  # Start with step penalty
 
+        # Process action
         if action == self.actions.move_left:
             if not self.collision(self.active_tetromino, self.x - 1, self.y):
                 self.x -= 1
+            else:
+                reward += self.rewards.invalid_action
         elif action == self.actions.move_right:
             if not self.collision(self.active_tetromino, self.x + 1, self.y):
                 self.x += 1
+            else:
+                reward += self.rewards.invalid_action
         elif action == self.actions.move_down:
             if not self.collision(self.active_tetromino, self.x, self.y + 1):
                 self.y += 1
+            else:
+                reward += self.rewards.invalid_action
         elif action == self.actions.rotate_clockwise:
-            if not self.collision(
-                self.rotate(self.active_tetromino, True), self.x, self.y
-            ):
-                self.active_tetromino = self.rotate(self.active_tetromino, True)
+            rotated_tetromino = self.rotate(self.active_tetromino, True)
+            if not self.collision(rotated_tetromino, self.x, self.y):
+                self.active_tetromino = rotated_tetromino
+            else:
+                reward += self.rewards.invalid_action
         elif action == self.actions.rotate_counterclockwise:
-            if not self.collision(
-                self.rotate(self.active_tetromino, False), self.x, self.y
-            ):
-                self.active_tetromino = self.rotate(self.active_tetromino, False)
+            rotated_tetromino = self.rotate(self.active_tetromino, False)
+            if not self.collision(rotated_tetromino, self.x, self.y):
+                self.active_tetromino = rotated_tetromino
+            else:
+                reward += self.rewards.invalid_action
         elif action == self.actions.swap:
             if not self.has_swapped:
-                # Swap the active tetromino with the one in the holder (saves orientation)
+                # Swap the active tetromino with the one in the holder
                 self.active_tetromino = self.holder.swap(self.active_tetromino)
                 self.has_swapped = True
                 if self.active_tetromino is None:
                     # If the holder is empty, spawn the next tetromino
-                    # No need for collision check, as the holder is only empty at the start
                     self.spawn_tetromino()
                 else:
                     self.reset_tetromino_position()
+            else:
+                reward += self.rewards.invalid_action
         elif action == self.actions.hard_drop:
-            reward, self.game_over, lines_cleared = self.commit_active_tetromino()
+            commit_reward, self.game_over, lines_cleared = self.commit_active_tetromino()
+            reward += commit_reward
         elif action == self.actions.no_op:
             pass
+        else:
+            reward += self.rewards.invalid_action
 
         # Gravity
         if self.gravity_enabled and action != self.actions.hard_drop:
@@ -261,7 +277,8 @@ class Tetris(gym.Env):
                 self.y += 1
             else:
                 # If there's no more room to move, lock in the tetromino
-                reward, self.game_over, lines_cleared = self.commit_active_tetromino()
+                commit_reward, self.game_over, lines_cleared = self.commit_active_tetromino()
+                reward += commit_reward
 
         return (
             self._get_obs(),
@@ -270,6 +287,7 @@ class Tetris(gym.Env):
             truncated,
             {"lines_cleared": lines_cleared},
         )
+
 
     def reset(
         self, *, seed: "int | None" = None, options: "dict[str, Any] | None" = None
@@ -303,6 +321,9 @@ class Tetris(gym.Env):
 
         # Render
         self.window_name = None
+
+        self.previous_holes = 0
+        self.previous_max_height = 0
 
         return self._get_obs(), self._get_info()
 
@@ -467,13 +488,31 @@ class Tetris(gym.Env):
             self.board, lines_cleared = self.clear_filled_rows(self.board)
             reward = self.score(lines_cleared)
 
-            # 2. Spawn the next tetromino and check if the game continues
+            # Compute holes and max height after placing the piece
+            current_holes = self.compute_holes(self.board)
+            current_max_height = self.compute_max_height(self.board)
+
+            # Calculate differences
+            holes_diff = current_holes - self.previous_holes
+            height_diff = current_max_height - self.previous_max_height
+
+            # Update rewards based on the differences
+            reward -= holes_diff * self.rewards.hole_penalty
+            reward -= height_diff * self.rewards.height_penalty
+
+            # Reward for placing a piece
+            reward += self.rewards.piece_placed
+
+            # Update previous state
+            self.previous_holes = current_holes
+            self.previous_max_height = current_max_height
+
+            # Check if the game continues
             self.game_over = not self.spawn_tetromino()
-            reward += self.rewards.alife
             if self.game_over:
                 reward = self.rewards.game_over
 
-            # 3. Reset the swap flag (agent can swap once per tetromino)
+            # Reset the swap flag
             self.has_swapped = False
 
         return reward, self.game_over, lines_cleared
@@ -627,7 +666,10 @@ class Tetris(gym.Env):
         Returns
             The score for the given number of lines cleared.
         """
-        return (rows_cleared**2) * self.width
+        if rows_cleared == 0:
+            return 0
+        else:
+            return self.rewards.clear_line * (2 ** (rows_cleared - 1))
 
     def create_board(self) -> np.ndarray:
         """Create a new board with the given dimensions."""
@@ -706,3 +748,28 @@ class Tetris(gym.Env):
             game_over=self.game_over,
             score=self.score,
         )
+    
+    def compute_holes(self, board) -> int:
+        """Compute the number of holes in the board."""
+        holes = 0
+        board = board[:-self.padding, self.padding:-self.padding]  # Remove padding
+        for col in range(board.shape[1]):
+            column = board[:, col]
+            filled = column != 0
+            encountered_filled = False
+            for cell in filled:
+                if cell:
+                    encountered_filled = True
+                elif encountered_filled:
+                    holes += 1
+        return holes
+
+    def compute_max_height(self, board) -> int:
+        """Compute the maximum height of the stack."""
+        board = board[:-self.padding, self.padding:-self.padding]  # Remove padding
+        for row in range(board.shape[0]):
+            if np.any(board[row, :] != 0):
+                max_height = board.shape[0] - row
+                return max_height
+        return 0
+
