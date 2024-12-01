@@ -1,1 +1,0 @@
-"""Tetris Gymnasium package."""
