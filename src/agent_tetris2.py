@@ -5,7 +5,7 @@ import torch
 import torch.nn as nn
 
 import cv2
-from tetris import Tetris
+from src.tetris import Tetris
 from collections import deque
 
 

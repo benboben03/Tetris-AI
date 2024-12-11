@@ -1,7 +1,7 @@
 import pickle
 import os
 import cv2
-from tetris import Tetris
+from src.tetris import Tetris
 
 
 def load_best_agent(file_name="best_agent.pkl"):
