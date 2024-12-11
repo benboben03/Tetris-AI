@@ -125,4 +125,5 @@ class GeneticAlgorithm:
         self.population = new_population
         max_fitness = max(fitness_scores)
         avg_fitness = sum(fitness_scores) / len(fitness_scores)
-        return max_fitness, avg_fitness
+        min_fitness = min(fitness_scores)  # Add this line to calculate min fitness
+        return max_fitness, avg_fitness, min_fitness  # Return all three values

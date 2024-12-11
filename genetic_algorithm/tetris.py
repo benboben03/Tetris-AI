@@ -244,40 +244,50 @@ class Tetris:
         img = img[..., ::-1]
         img = Image.fromarray(img, "RGB")
 
+        # Resize the game board
         img = img.resize((self.width * self.block_size, self.height * self.block_size), 0)
         img = np.array(img)
         img[[i * self.block_size for i in range(self.height)], :, :] = 0
         img[:, [i * self.block_size for i in range(self.width)], :] = 0
 
+        # Adjust the size of the extra board for better display
+        self.extra_board = np.ones(
+            (self.height * self.block_size, self.width * self.block_size, 3),
+            dtype=np.uint8
+        ) * np.array([204, 204, 255], dtype=np.uint8)
+
+        # Concatenate the game board with the extra board
         img = np.concatenate((img, self.extra_board), axis=1)
 
+        # Text properties
+        text_x = self.width * self.block_size + int(self.block_size / 2)
+        line_spacing = int(self.block_size * 1.5)
+        font_scale = 1.5
 
-        cv2.putText(img, "Score:", (self.width * self.block_size + int(self.block_size / 2), self.block_size),
-                    fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=1.0, color=self.text_color)
+        # Display score, pieces, and lines
+        cv2.putText(img, "Score:", (text_x, line_spacing),
+                    fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=font_scale, color=self.text_color)
         cv2.putText(img, str(self.score),
-                    (self.width * self.block_size + int(self.block_size / 2), 2 * self.block_size),
-                    fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=1.0, color=self.text_color)
+                    (text_x, 2 * line_spacing),
+                    fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=font_scale, color=self.text_color)
 
-        cv2.putText(img, "Pieces:", (self.width * self.block_size + int(self.block_size / 2), 4 * self.block_size),
-                    fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=1.0, color=self.text_color)
+        cv2.putText(img, "Pieces:", (text_x, 4 * line_spacing),
+                    fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=font_scale, color=self.text_color)
         cv2.putText(img, str(self.tetrominoes),
-                    (self.width * self.block_size + int(self.block_size / 2), 5 * self.block_size),
-                    fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=1.0, color=self.text_color)
+                    (text_x, 5 * line_spacing),
+                    fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=font_scale, color=self.text_color)
 
-        cv2.putText(img, "Lines:", (self.width * self.block_size + int(self.block_size / 2), 7 * self.block_size),
-                    fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=1.0, color=self.text_color)
+        cv2.putText(img, "Lines:", (text_x, 7 * line_spacing),
+                    fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=font_scale, color=self.text_color)
         cv2.putText(img, str(self.cleared_lines),
-                    (self.width * self.block_size + int(self.block_size / 2), 8 * self.block_size),
-                    fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=1.0, color=self.text_color)
+                    (text_x, 8 * line_spacing),
+                    fontFace=cv2.FONT_HERSHEY_DUPLEX, fontScale=font_scale, color=self.text_color)
 
         if mode == 'human':
             if video:
                 video.write(img)
 
-            cv2.imshow("Deep Q-Learning Tetris", img)
+            cv2.imshow("Genetic Algorithm", img)
             cv2.waitKey(1)
         elif mode == 'rgb_array':
             return img
-
-        cv2.imshow("Deep Q-Learning Tetris", img)
-        cv2.waitKey(1)
