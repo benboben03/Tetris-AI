@@ -1,7 +1,7 @@
 import pickle
 import os
 import cv2
-from src.tetris import Tetris
+from genetic_algorithm.genetic_tetris_env import Tetris
 
 
 def load_best_agent(file_name="best_agent.pkl"):

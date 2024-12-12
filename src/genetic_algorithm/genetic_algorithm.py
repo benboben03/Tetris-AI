@@ -1,7 +1,7 @@
 import numpy as np
 import random
 from agent_genetic import GeneticAgent
-from src.tetris import Tetris
+from genetic_algorithm.genetic_tetris_env import Tetris
 import cv2
 
 class GeneticAlgorithm:

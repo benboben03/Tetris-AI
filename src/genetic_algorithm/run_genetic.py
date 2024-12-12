@@ -3,7 +3,7 @@ import gc
 import pickle
 from genetic_algorithm import GeneticAlgorithm
 from agent_genetic import GeneticAgent
-from src.tetris import Tetris
+from genetic_algorithm.genetic_tetris_env import Tetris
 import numpy as np
 import matplotlib.pyplot as plt
 
