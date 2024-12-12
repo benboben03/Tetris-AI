@@ -1,19 +1,24 @@
 import pickle
 import os
 import cv2
-from genetic_algorithm.genetic_tetris_env import Tetris
+from genetic_algorithm.tetris import Tetris
 
 
 def load_best_agent(file_name="best_agent.pkl"):
     """Loads the best agent from a file using pickle."""
-    absolute_path = os.path.abspath(file_name)
-    directory = os.path.dirname(absolute_path)
-    print(f"Loading best agent from: {absolute_path}")
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(script_dir, file_name)
 
-    file_size = os.path.getsize(file_name)
-    print(f"Best agent saved to {absolute_path} ({file_size / (1024 * 1024):.2f} MB)")
-    with open(file_name, "rb") as f:
-        return pickle.load(f), directory
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    file_size = os.path.getsize(file_path)
+    print(f"Loading best agent from: {file_path} ({file_size / (1024 * 1024):.2f} MB)")
+
+    # Load the agent
+    with open(file_path, "rb") as f:
+        return pickle.load(f)
+
 
 
 def test_agent(agent, video_filename):
@@ -47,8 +52,8 @@ def test_agent(agent, video_filename):
 
 if __name__ == "__main__":
     # Load the best agent and get its directory
-    best_agent, agent_directory = load_best_agent("genetic_algorithm/best_agent.pkl")
-    video_filename = os.path.join(agent_directory, "tetris_gameplay.mp4")
+    best_agent = load_best_agent("best_agent.pkl")
+    video_filename = os.path.join("src/genetic_algorithm/Results/tetris_gameplay.mp4")
 
     # Test and record the agent
     test_agent(best_agent, video_filename=video_filename)

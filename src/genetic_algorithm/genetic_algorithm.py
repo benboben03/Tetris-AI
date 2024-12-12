@@ -1,7 +1,7 @@
 import numpy as np
 import random
 from agent_genetic import GeneticAgent
-from genetic_algorithm.genetic_tetris_env import Tetris
+from genetic_algorithm.tetris import Tetris
 import cv2
 
 class GeneticAlgorithm:
@@ -125,5 +125,5 @@ class GeneticAlgorithm:
         self.population = new_population
         max_fitness = max(fitness_scores)
         avg_fitness = sum(fitness_scores) / len(fitness_scores)
-        min_fitness = min(fitness_scores)  # Add this line to calculate min fitness
-        return max_fitness, avg_fitness, min_fitness  # Return all three values
+        min_fitness = min(fitness_scores)
+        return max_fitness, avg_fitness, min_fitness

@@ -3,7 +3,7 @@ import gc
 import pickle
 from genetic_algorithm import GeneticAlgorithm
 from agent_genetic import GeneticAgent
-from genetic_algorithm.genetic_tetris_env import Tetris
+from genetic_algorithm.tetris import Tetris
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -30,7 +30,7 @@ def train_genetic_algorithm():
         generation += 1
         print(f"Generation {generation}")
         # Evolve population and get fitness statistics
-        max_fitness, avg_fitness, min_fitness = ga.evolve(render=False, grid_size=(4, 3))  # Render games
+        max_fitness, avg_fitness, min_fitness = ga.evolve(render=True, grid_size=(4, 3))  # Render games
         print(f"Max Fitness = {max_fitness}, Avg Fitness = {avg_fitness}, Min Fitness = {min_fitness}")
         gc.collect()  # clear unused memory
 
