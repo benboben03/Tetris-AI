@@ -48,21 +48,19 @@ All GA-related code resides in the `genetic_algorithm` directory.
 ---
 
 ## Results
-### DQN Gameplay
-Here is the gameplay of the DQN model in action using a linear scoring, achieving high scores through reinforcement learning strategies:
 
-![DQN Gameplay](docs/assets/DQN_Linear.gif)
+### Performance Highlights
+- **Genetic Algorithm (GA)**: Achieved a high score of **10 million** by leveraging population-based exploration and adaptation.  
+- **Deep Q-Network (DQN)**: Reached a score of **4 million** through efficient state-action representation and learning.  
+- **PPO**: Remains a work in progress but offers potential for future improvements.  
 
-### Genetic Algorithm (GA) Gameplay
-The genetic algorithm showcases its evolutionary approach, leading to high scores and adaptable gameplay with a population:
-
-![GA Gameplay](docs/assets/GA_Training.gif)  
-Here is the GA best agent scoring a high score:  
-![GA BestAgent](docs/assets/GA_Best_Agent.gif)
-
-- **Genetic Algorithm (GA)**: Achieved a record score of **10 million** through adaptive evolution strategies.  
-- **Deep Q-Network (DQN)**: Achieved a score of **4 million** with expanded state observations and optimized neural networks.  
-- **PPO**: Work in progress with potential for future development.
+### Gameplay Visuals
+- **DQN Gameplay**:  
+  ![DQN Gameplay](docs/assets/DQN_Linear.gif)  
+- **GA Training**:  
+  ![GA Gameplay](docs/assets/GA_Training.gif)  
+- **GA Best Agent**:  
+  ![GA BestAgent](docs/assets/GA_Best_Agent.gif)
 
 ---
 
@@ -87,11 +85,6 @@ A detailed research paper documenting the project, methods, and results is avail
 
 ---
 
-## Disclaimer
-This project builds upon the open-source Tetris implementation by [vietnh1009](https://github.com/vietnh1009/Tetris-deep-Q-learning-pytorch). Some models utilize a modified version of `tetris.py`, which is not directly included in this repository to avoid confusion. Full credit to the original author.
-
----
-
 ## How to Run the Project
 1. Clone the repository.  
 2. Install dependencies listed in `requirements.txt`.  
@@ -103,3 +96,19 @@ This project builds upon the open-source Tetris implementation by [vietnh1009](h
 - Extend PPO implementation.  
 - Fine-tune hyperparameters and model architectures.  
 - Explore hybrid approaches combining GA with DQN for enhanced performance.
+
+---
+
+## Acknowledgments
+This project builds upon the open-source environment by [Viet Nguyen](https://github.com/vietnh1009/Tetris-deep-Q-learning-pytorch).  
+
+Contributors:  
+- **Ben T. Boben**  
+- **Rohan Joseph Jayasekara**  
+
+---
+
+## Disclaimer
+This project builds upon the open-source Tetris implementation by [vietnh1009](https://github.com/vietnh1009/Tetris-deep-Q-learning-pytorch). Some models utilize a modified version of `tetris.py`, which is not directly included in this repository to avoid confusion. Full credit to the original author.
+
+---
