@@ -103,7 +103,7 @@ A detailed research paper documenting the project, methods, and results is avail
 This project builds upon the open-source environment by [Viet Nguyen](https://github.com/vietnh1009/Tetris-deep-Q-learning-pytorch).  
 
 Contributors:  
-- **Ben T. Boben**  
+- **Ben Boben**  
 - **Rohan Joseph Jayasekara**  
 
 ---
